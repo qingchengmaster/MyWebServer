@@ -1,5 +1,5 @@
 #ifndef LOCKER_H
-#define LOCRER_H
+#define LOCKER_H
 #include <cstdio>
 #include <pthread.h>
 #include <exception>
@@ -20,7 +20,7 @@ public:
     bool lock(){
         return pthread_mutex_lock(&m_mutex)==0;
     }
-    bool lock(){
+    bool unlock(){
         return pthread_mutex_unlock(&m_mutex)==0;
     }
     pthread_mutex_t *get(){

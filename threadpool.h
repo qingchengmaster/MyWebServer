@@ -5,6 +5,7 @@
 #include <list>
 #include <exception>
 #include <iostream>
+
 //线程池类（模板类）
 template<typename T>//T:任务类
 class threadpool{
@@ -42,7 +43,7 @@ private:
 template<typename T>
 threadpool<T>::threadpool(int thread_number,int max_requests):
     m_thread_number(thread_number),m_max_requests(max_requests),
-    m_stop(false),m_thread(NULL){
+    m_stop(false),m_threads(NULL){
         if((thread_number<=0)||(max_requests<=0)){
             throw std::exception();
         }
@@ -53,14 +54,14 @@ threadpool<T>::threadpool(int thread_number,int max_requests):
 
         //创建进程，并将它们设置为线程脱离
         for(int i=0;i<thread_number;++i){
-            cout<<"create the "<<i<<"th thread"<<endl;
+            printf("create the %d th thread\n",i);
             if(pthread_create(m_threads+i,NULL,worker,this)){
                 delete[] m_threads;
                 throw std::exception();
             }
 
             //线程分离
-            if(pthread_detach(m_thread[i])){
+            if(pthread_detach(m_threads[i])){
                 delete[] m_threads;
                 throw std::exception();
             }
@@ -100,13 +101,13 @@ void threadpool<T>::run(){
             m_queuelocker.unlock();
             continue;
         }
+        T* request=m_workqueue.front();
+        m_workqueue.pop_front();
+        m_queuelocker.unlock();
+        if(!request){
+            continue;
+        }
+        request->process();
     }
-    T* request=m_workqueue.front();
-    m_workqueue.push_front;
-    m_queuelocker.unlock();
-    if(!requese){
-        continue;
-    }
-    request->process();
 }
 #endif
